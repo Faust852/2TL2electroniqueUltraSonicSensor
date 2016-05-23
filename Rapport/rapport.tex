@@ -1,0 +1,121 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{listings}
+
+\title{Projet C}
+\author{Culem Adrien \\ Marchal François\\Massart Florian \\Micciche David}
+
+\begin{document}
+\begin{titlepage}
+	\centering
+	{\scshape\LARGE École pratique des hautes études commerciales \par}
+	\vspace{1cm}
+	{\scshape\Large Rapport Final\par}
+	\vspace{1.5cm}
+	{\huge\bfseries Électronique \par}
+	\vspace{1cm}
+	{\Large\itshape 
+    Culem Adrien\\Marchal François\\Massart Florian\\Micciche David\\2TL2\par}
+    \includegraphics[scale=0.5]{sensor.jpg}
+	\vfill
+	Dewulf A. \& Bouterfa Y.
+
+	\vfill
+
+	{\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introduction \& Objectifs}
+Dans le cadre du cours pratique d'électronique, il nous a été demandé par groupe de 4 de réaliser un télémètre à l’aide d’un circuit imprimé à réaliser nous-mêmes à partir d’un circuit vierge, de composants (PIC, sonde à ultrasons, condensateurs, etc) et de la suite logicielle nécessaire à son bon fonctionnement: programme en C exécuté par le PIC et application Java pour interagir avec celui-ci.
+
+\section{Méthode de travail}
+Nous avons décidé de réaliser toutes les étapes qui composent de le projet tous ensemble, afin de maximiser les échanges et les idées et solutions aux problèmes rencontrés. \\
+Tout le monde a donné son avis et partagé ses idées quant aux différents éléments constituant le projet, que ce soit lors du design de la carte sur ordinateur, la simulation informatisée ou la réalisation physique de la carte.  
+
+\section{Planning}
+Les étapes de réalisation du projet ainsi que la réflexion de groupe ont été réalisées lors de conférences rassemblant tout les membres du groupe les mercredis après-midi. \\
+La partie hardware a été réalisée lors des heures de travaux pratiques d'électronique dans les laboratoires les mercredis matin.
+
+\section{Descriptif de la carte}
+Il s’agit d’un circuit imprimé permettant de mesurer la distance le séparant d’une surface plane située perpendiculairement à lui-même, avec une marge de 45° max, à l’aide d’ondes ultrasons et capable d’indiquer un signal en cas de dépassement d’une distance limite définie à l’aide d’un logiciel.
+
+\section{Fonctionnement de la carte}
+\begin{center}
+\includegraphics[scale=0.5]{rxtx.jpg} \\
+\end{center}
+la sonde à ultrasons envoie un signal de déclenchement au niveau haut (5V) sur la pin ECHO pendant au moins 10 µs. Le module émet alors 8 impulsions successives à une fréquence de 40KHz.\\
+Si elle rencontre un obstacle, l’onde ultrasonique se reflète et revient à la sonde.\\
+La sortie ECHO du capteur est à l'état haut (5V) pendant la durée nécessaire à l’envoi la réception de l’impulsion ultrasonique. La largeur d'impulsion est comprise entre environ 150$\mu$s à 25 ms. Si l’onde ne se reflète sur aucun obstacle, la largeur d'impulsion d'écho sera d'environ 38ms.
+
+Le contrôleur PIC interprète ensuite la tension en une distance qui est affichée en cm sur un afficheur LCD et envoyée sur le port série afin d'être également affichée dans la console de l’application java.
+\section{Mode d’emploi}
+\begin{itemize}
+\item Alimenter la carte avec une tension de 5V continue
+\item Relier la carte à un PC via un câble série
+\item Appuyer sur le bouton Reset de la carte
+\item Insérer le code C dans la carte à l’aide du port série présent sur la carte
+\item Démarrer l’application java livrée avec la carte
+\item Sélectionner le port COM dans la liste prévue à cet effet
+\item Appuyer sur Connect pour établir la liaison entre la carte et l’application
+L’utilisateur a la possibilité de définir la valeur seuil à l’aide du sélecteur dans l’application.
+
+
+\end{itemize}
+\section{Descriptif de l’application}
+\begin{center}
+\includegraphics[scale=0.5]{gui.png}\\
+\end{center}
+L’application permet de définir la valeur seuil et de visualiser la distance actuelle en temps réel.
+Un indicateur vous indique si la valeur mesurée est supérieure ou inférieure à la valeur seuil.\\
+
+Distance $\textgreater$ valeur seuil OU Distance  = valeur seuil $\rightarrow$ Limit Respected
+
+Distance $\textless$ valeur seuil $\rightarrow$ Limit Exceeded \\
+\newpage
+Tests: \\
+\begin{center}
+\begin{tabular}{ | l | c | r |}
+\hline
+Description du test & résultat obtenu & résultat attendu \\
+\hline
+Distance \textless  valeur seuil & Led rouge clignotante & Led rouge clignotante \\
+\hline
+Distance = valeur seuil & Led verte allumée & Led verte allumée \\
+\hline
+Distance  \textgreater  valeur seuil & Led verte allumée & Led verte allumée \\
+\hline
+Distance hors limites & (impossible en simulation) & (impossible en simulation) \\
+\hline
+\end{tabular}
+\end{center}
+\section{Limites, améliorations et problèmes rencontrés}
+
+distance minimale: 2 cm \\
+distance maximale: 400 à 500 cm \\
+\\
+
+Lors de l'impression de la plaque, il y a eu une erreur pendant du calque sur la plaque, celle-ci a donc imprimée a l'envers. \\
+Nous avons donc décidez de nous limiter à la simulation de Proteus. \\
+
+Nous avons choisi d'afficher les valeurs de distance sur un LCD, un problème est survenu et l'afficheur LCD scintillait. La solution était simplement d'ajouter un délai a fin de la boucle lors de l'exécution du code C.  \\
+
+Bien que le programme Java envoi des informations au PIC via le port série, l'interprétation de ces data s'est avéré compliquée et nous n'avons pas su terminer avant la remise du projet. \\
+
+Nous utilisons la libraire RxTx pour le transfère de données entre le code Java et le PIC, mais nous avons eu un problème de comptabilité, pour corriger ça, il a valu lancer le projet Java en 32 bits. \\
+
+
+\section{Conclusion}
+En conclusion, nous avons trouvé ce projet très intéressant et instructif. Il nous a permis de mettre en pratique les connaissances que nous avons acquises durant l’année au sein d’une réalisation pluridisciplinaire. \\
+Malgré l’erreur d’impression de la carte, nous sommes tout de même passés par toutes les étapes de création du télémètre incluant la création du circuit dans Eagle, la simulation dans Proteus, la fonte de la carte et l’écriture des des codes sources C et Java.
+
+\section{Ressources techniques}
+Code C, Java et datasheets des composants: Voir en annexe.
+\end{document}
